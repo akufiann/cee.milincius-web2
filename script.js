@@ -47,7 +47,7 @@ async function muatMenu() {
             }).format(item.harga);
 
             card.innerHTML = `
-                <img src="${item.gambar || 'https://via.placeholder.com/300x200?text=Cee+Milincius'}" alt="${item.nama}" loading="lazy">
+                <img src="${item.gambar_url || 'https://via.placeholder.com/300x200?text=Cee+Milincius'}" alt="${item.nama}" loading="lazy">
                 <div class="card-info">
                     <h3>${item.nama}</h3>
                     <p>${hargaFormatted}</p>
