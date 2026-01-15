@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cee Milincius | Cemilan Enak</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">Cee<span>Milincius</span></div>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="location.reload()">Home</a></li>
+                <li><a href="#jajan">Menu</a></li>
+                <li><a href="https://wa.me/6285814211259" target="_blank">Kontak</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+        <div class="hero-content">
+            <h1>Cee.Milincius</h1>
+            <p>Jajanan anak Gen Z</p>
+            <button class="btn-mulai" onclick="scrollToJajan()">Mulai Jajan</button>
+        </div>
+    </section>
+
+    <section id="jajan" class="area-jajan">
+        <h2 class="section-title">Menu Spesial</h2>
+        
+        <div class="grid-menu" id="menu-container">
+            <div class="loading">Menyiapkan jajanan favoritmu...</div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
