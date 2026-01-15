@@ -14,7 +14,7 @@ exports.handler = async (event, context) => {
     await client.connect();
 
     // 3. Mengambil data (Pastikan nama kolom 'gambar' sudah kamu buat di Neon)
-    const query = 'SELECT id, nama, harga, kategori, gambar FROM produk ORDER BY id ASC';
+    const query = 'SELECT id, nama, harga, kategori, gambar_url FROM produk ORDER BY id ASC';
     const result = await client.query(query);
 
     // 4. Kirim data ke website (Frontend)
