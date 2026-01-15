@@ -1,6 +1,8 @@
 {
   "name": "cee-milincius-web",
   "version": "1.0.0",
+  "description": "Website Jajanan",
+  "main": "index.js",
   "dependencies": {
     "pg": "^8.11.0"
   }
