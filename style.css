@@ -70,6 +70,59 @@ html { scroll-behavior: smooth; }
 .card img { width: 100%; height: 160px; object-fit: cover; }
 .card-info { padding: 15px; text-align: center; }
 
+ /* Footer styling */
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 50px 20px 30px;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 40px;
+        }
+        .footer-column h3 {
+            color: #ff9800;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .footer-column p {
+            color: #ccc;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .social-links a:hover {
+            background-color: #ff9800;
+            transform: translateY(-3px);
+        }
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
 /* -------------------------------------------------- */
 /* --- BAGIAN RESPONSIVE (TAMBAHKAN DI BAWAH INI) --- */
 /* -------------------------------------------------- */
