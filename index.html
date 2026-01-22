@@ -37,6 +37,20 @@
         </div>
     </section>
 
+    <div id="product-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div id="modal-info"></div>
+        <div id="dynamic-options-container"></div>
+        
+        <div class="modal-footer">
+            <button class="btn-checkout" onclick="kirimWA()">
+                Beli Sekarang - Rp <span id="modal-total-price">0</span>
+            </button>
+        </div>
+    </div>
+</div>
+
     <script src="script.js"></script>
 </body>
 </html>
