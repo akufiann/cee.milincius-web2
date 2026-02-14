@@ -1,3 +1,10 @@
+// Letakkan di baris paling atas fixing.js
+const VERSION = "1.1"; 
+if (localStorage.getItem('app_version') !== VERSION) {
+    localStorage.clear(); // Hapus cache lama
+    localStorage.setItem('app_version', VERSION);
+}
+
 let currentUser = JSON.parse(localStorage.getItem('cee_user')) || null;
 let isRegisterMode = false;
 
