@@ -58,4 +58,13 @@ exports.handler = async (event, context) => {
       }),
     };
   }
+
 };
+
+try {
+    await client.connect();
+    // ... proses simpan ...
+} finally {
+    // BAGIAN INI WAJIB: Biar koneksi database gak gantung/penuh
+    await client.end(); 
+}
