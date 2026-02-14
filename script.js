@@ -1,135 +1,115 @@
-let currentProduct = {};
-let basePrice = 0;
+let currentUser = JSON.parse(localStorage.getItem('cee_user')) || null;
+let isRegisterMode = false;
 
-// 1. SCROLL HALUS
-function scrollToJajan() {
-    document.getElementById('jajan').scrollIntoView({ behavior: 'smooth' });
+function initApp() {
+    updateNavbar();
+    muatMenu();
 }
 
-// 2. AMBIL DATA DARI DATABASE
+function updateNavbar() {
+    const userDisplay = document.getElementById('user-display');
+    if (currentUser && userDisplay) {
+        userDisplay.innerHTML = `
+            <div class="user-info-nav">
+                <span style="font-size:0.8rem;">Halo, <b>${currentUser.username}</b></span>
+                <button class="btn-login-nav" style="background:#ff4444; padding:4px 8px; font-size:0.7rem;" onclick="logout()">Logout</button>
+            </div>
+        `;
+    }
+}
+
 async function muatMenu() {
     const container = document.getElementById('menu-container');
     try {
-        const response = await fetch('/.netlify/functions/get-produk');
-        if (!response.ok) throw new Error('Gagal ambil data');
+        // Memanggil Netlify Function kamu untuk ambil produk
+        const response = await fetch('/.netlify/functions/get-produk'); 
         const data = await response.json();
         
-        container.innerHTML = ''; 
-        if (data.length === 0) {
-            container.innerHTML = '<p>Menu belum tersedia.</p>';
-            return;
-        }
-
+        container.innerHTML = '';
         data.forEach(item => {
             const card = document.createElement('div');
             card.className = 'card';
-            
-            // Klik kartu untuk buka modal
-            card.onclick = () => openModal(item);
-
-            // REVISI GAMBAR: Mengutamakan gambar_url dari database
+            card.onclick = () => openDetail(item);
             card.innerHTML = `
-                <div class="card-img-container">
-                    <img src="${item.gambar_url}" onerror="this.src='https://via.placeholder.com/300?text=Cee+Milincius'" alt="${item.nama}">
-                    <span class="badge-kategori">${item.kategori || 'Menu'}</span>
-                </div>
-                <div class="card-info">
+                <img src="${item.gambar_url}" alt="${item.nama}">
+                <div class="card-header-info">
                     <h3>${item.nama}</h3>
-                    <p class="price-tag">Rp ${Number(item.harga).toLocaleString('id-ID')}</p>
-                    <span class="btn-pilih">Pilih Varian</span>
+                    <span class="price">Rp ${Number(item.harga).toLocaleString('id-ID')}</span>
                 </div>
             `;
             container.appendChild(card);
         });
-    } catch (error) {
-        container.innerHTML = `<p style="color:red">Error: ${error.message}</p>`;
+    } catch (e) {
+        container.innerHTML = '<p>Gagal memuat menu. Cek koneksi Neon Database.</p>';
     }
 }
 
-// 3. LOGIKA MODAL (ALA SHOPEE)
-function openModal(produk) {
-    currentProduct = produk;
-    basePrice = Number(produk.harga);
-    
-    // Isi info produk di modal
-    document.getElementById('modal-info').innerHTML = `
-        <img src="${produk.gambar_url}" class="modal-img">
-        <h2>${produk.nama}</h2>
-        <p class="modal-desc">${produk.deskripsi || 'Jajanan hits kualitas premium.'}</p>
+function openDetail(produk) {
+    const panel = document.getElementById('side-panel');
+    const body = document.getElementById('panel-body');
+    const orderID = "CEE-" + Math.floor(1000 + Math.random() * 9000);
+
+    body.innerHTML = `
+        <div style="padding:20px;">
+            <img src="${produk.gambar_url}" style="width:100%; border-radius:15px; height:220px; object-fit:cover;">
+            <div style="display:flex; justify-content:space-between; margin-top:15px;">
+                <h2>${produk.nama}</h2>
+                <h2 style="color:#ff9800">Rp ${Number(produk.harga).toLocaleString('id-ID')}</h2>
+            </div>
+            <p style="color:#666; margin:15px 0; font-size:0.9rem;">${produk.deskripsi || 'Jajanan premium pilihan.'}</p>
+            <p style="font-size:0.8rem; color:#999;">ID Pesanan: ${orderID}</p>
+        </div>
+        <div class="panel-footer">
+            <button class="btn-checkout-final" onclick="prosesOrder('${produk.nama}', '${orderID}')">
+                Pesan via WhatsApp
+            </button>
+        </div>
     `;
+    panel.classList.remove('hidden');
+}
 
-    // Render pilihan varian berdasarkan kategori
-    renderDynamicOptions(produk.kategori);
-    hitungTotal();
+function toggleAuthMode() {
+    isRegisterMode = !isRegisterMode;
+    document.getElementById('auth-title').innerText = isRegisterMode ? "Daftar Akun Baru" : "👋 Halo Milincius Lover!";
+    document.getElementById('btn-auth-submit').innerText = isRegisterMode ? "Daftar Sekarang" : "Masuk & Belanja";
+    document.getElementById('register-only-fields').classList.toggle('hidden');
+    document.getElementById('toggle-link').innerText = isRegisterMode ? "Login di sini" : "Daftar di sini";
+}
+
+async function saveLogin() {
+    const user = document.getElementById('login-username').value;
+    const phone = document.getElementById('login-phone').value;
+    const lokasi = document.getElementById('login-location')?.value || "Kediri";
+
+    if(!user || !phone) return alert("Isi nama dan WA dulu ya!");
+
+    const userData = { username: user, phone: phone, location: lokasi };
     
-    document.getElementById('product-modal').classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    // Simpan Lokal
+    localStorage.setItem('cee_user', JSON.stringify(userData));
+
+    // SIMPAN RAHASIA KE NEON VIA NETLIFY FUNCTION
+    try {
+        await fetch('/.netlify/functions/save-user', {
+            method: 'POST',
+            body: JSON.stringify(userData)
+        });
+    } catch (err) { console.error("Sync error"); }
+
+    alert("Berhasil masuk!");
+    location.reload();
 }
 
-function renderDynamicOptions(kategori) {
-    const container = document.getElementById('dynamic-options-container');
-    let html = '';
-
-    if (kategori === 'Si Manis') {
-        html = `
-            <p class="label-opsi">Pilih Rasa:</p>
-            <div class="option-grid">
-                <label><input type="radio" name="rasa" value="Coklat" checked> Coklat</label>
-                <label><input type="radio" name="rasa" value="Taro"> Taro</label>
-                <label><input type="radio" name="rasa" value="Matcha"> Matcha</label>
-            </div>
-            <p class="label-opsi">Extra Topping (+2rb):</p>
-            <div class="option-grid">
-                <label><input type="checkbox" name="topping" value="Keju" onchange="hitungTotal()"> Keju</label>
-                <label><input type="checkbox" name="topping" value="Oreo" onchange="hitungTotal()"> Oreo</label>
-            </div>`;
-    } else if (kategori === 'Si Pedas Gurih') {
-        html = `
-            <p class="label-opsi">Level Pedas:</p>
-            <div class="option-grid">
-                <label><input type="radio" name="rasa" value="Original" checked> Ori</label>
-                <label><input type="radio" name="rasa" value="Pedas Dikit"> Dikit</label>
-                <label><input type="radio" name="rasa" value="Pedas Nampol"> Nampol</label>
-            </div>
-            <p class="label-opsi">Tambahan:</p>
-            <div class="option-grid">
-                <label><input type="checkbox" name="topping" value="Chili Oil" onchange="hitungTotal()"> Chili Oil</label>
-            </div>`;
-    } else {
-        html = `<input type="hidden" name="rasa" value="Default">`;
-    }
-    container.innerHTML = html;
-}
-
-function closeModal() {
-    document.getElementById('product-modal').classList.add('hidden');
-    document.body.style.overflow = 'auto';
-}
-
-function hitungTotal() {
-    const toppings = document.querySelectorAll('input[name="topping"]:checked');
-    let total = basePrice + (toppings.length * 2000);
-    document.getElementById('modal-total-price').innerText = total.toLocaleString('id-ID');
-}
-
-// 4. KIRIM WA DENGAN VARIAN LENGKAP
-function kirimWA() {
-    const rasaEl = document.querySelector('input[name="rasa"]:checked') || document.querySelector('input[name="rasa"]');
-    const rasa = rasaEl ? rasaEl.value : '-';
-    const toppings = Array.from(document.querySelectorAll('input[name="topping"]:checked')).map(t => t.value);
-    
-    let total = basePrice + (toppings.length * 2000);
-    
-    let pesan = `Halo Cee Milincius! 👋%0A%0A*PESANAN BARU*%0A`;
-    pesan += `--------------------------%0A`;
-    pesan += `*Produk:* ${currentProduct.nama}%0A`;
-    pesan += `*Varian:* ${rasa}%0A`;
-    if (toppings.length > 0) pesan += `*Topping:* ${toppings.join(', ')}%0A`;
-    pesan += `--------------------------%0A`;
-    pesan += `*Total: Rp ${total.toLocaleString('id-ID')}*%0A%0A`;
-    pesan += `Tolong diproses ya kak!`;
-
+function prosesOrder(nama, id) {
+    if(!currentUser) return openLoginModal();
+    const pesan = `*PESANAN BARU | ${id}*%0A*Produk:* ${nama}%0A*Nama:* ${currentUser.username}%0A*Lokasi:* ${currentUser.location}`;
     window.open(`https://wa.me/6285814211259?text=${pesan}`, '_blank');
 }
 
-document.addEventListener('DOMContentLoaded', muatMenu);
+function logout() { localStorage.removeItem('cee_user'); location.reload(); }
+function openLoginModal() { document.getElementById('login-modal').classList.remove('hidden'); }
+function closeModal() { document.getElementById('login-modal').classList.add('hidden'); }
+function closePanel() { document.getElementById('side-panel').classList.add('hidden'); }
+function scrollToJajan() { document.getElementById('jajan').scrollIntoView({ behavior: 'smooth' }); }
+
+document.addEventListener('DOMContentLoaded', initApp);
