@@ -1,85 +1,140 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cee-Milincius | Cemilan Enak</title>
-    
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap">
+    <title>Cee Milincius | Jajanan Gen Z</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <header class="navbar">
-        <div class="logo">Cee<span>Milincius</span></div>
-        <nav>
-            <ul>
-                <li><a href="index.html" onclick="location.reload()">Home</a></li>
-                <li><a href="#jajan">Menu</a></li>
-                <li><a href="https://wa.me/6285814211259" target="_blank">Kontak</a></li>
-            </ul>
-        </nav>
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="#">
+                    <img src="https://res.cloudinary.com/dur7r6ylh/image/upload/v1770858981/logo_uqabnn.png"
+                        alt="Logo Cee" class="business-logo">
+                    <span>Cee</span>milincius
+                </a>
+            </div>
+
+            <nav class="nav-central">
+                <ul>
+                    <li><a href="#">Beranda</a></li>
+                    <li><a href="#jajan">Menu</a></li>
+                    <li><a href="https://wa.me/6285814211259">Kontak</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-user" id="user-display">
+                <button class="btn-login-nav" onclick="openLoginModal()">Daftar/Login</button>
+            </div>
+        </div>
     </header>
 
-    <section class="dashboard">
-        <div class="hero-content">
-            <h1>Cee.Milincius</h1>
-            <p>Jajanan anak Gen Z</p>
-            <button class="btn-mulai" onclick="scrollToJajan()">Mulai Jajan</button>
-        </div>
-    </section>
+    <main class="main-layout">
+        <aside class="side-info">
+            <div class="info-card">
+                <h3>Selamat Datang..</h3>
+                <p>Website ini sedang dalam pengembangan.<br>
+                Apabila mengalami kendala, harap contact admin website melalui email atau nomor wa yaa. Terimakasih</p>
+            </div>
+            <div class="info-card">
+                <h3>📍 Lokasi</h3>
+                <p>Kediri, Jawa Timur, Indonesia.</p>
+            </div>
+        </aside>
+
+        <section class="dashboard-hero">
+            <div class="hero-content">
+                <div class="hero-logo-container">
+                    <img src="https://res.cloudinary.com/dur7r6ylh/image/upload/v1770858981/logo_uqabnn.png"
+                        class="hero-main-logo">
+                </div>
+                <h1>Cee<span>milincius</span></h1>
+                <h3>Cemilan Kekinian Favorit Gen-Z</h3>
+                <p>Pilihan manis, gurih, dan pedas yang bisa kamu custom sesuai selera.</p>
+                <button class="btn-mulai" onclick="scrollToJajan()">Mulai Jajan</button>
+            </div>
+        </section>
+    </main>
 
     <section id="jajan" class="area-jajan">
         <h2 class="section-title">Menu Spesial</h2>
-        
         <div class="grid-menu" id="menu-container">
             <div class="loading">Menyiapkan jajanan favoritmu...</div>
         </div>
     </section>
 
-    <div id="product-modal" class="modal hidden">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeModal()">&times;</span>
-        <div id="modal-info"></div>
-        <div id="dynamic-options-container"></div>
-        
-        <div class="modal-footer">
-            <button class="btn-checkout" onclick="kirimWA()">
-                Beli Sekarang - Rp <span id="modal-total-price">0</span>
-            </button>
+    <div id="login-modal" class="modal hidden">
+        <div class="login-box">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="auth-title">👋 Halo Milincius Lover!</h2>
+            <p id="auth-desc">Masukan data kamu untuk memudahkan pengantaran.</p>
+            <div class="input-group">
+                <input type="text" id="login-username" placeholder="Nama / Username">
+                <input type="number" id="login-phone" placeholder="WhatsApp (08...)">
+                <div id="register-only-fields" class="hidden">
+                    <input type="text" id="login-location" placeholder="Alamat Lengkap (Kec. Puncu)">
+                </div>
+            </div>
+            <button id="btn-auth-submit" class="btn-save-login" onclick="saveLogin()">Masuk & Belanja</button>
+            <p style="margin-top: 15px; font-size: 0.85rem;">
+                <span id="toggle-text">Belum punya akun?</span>
+                <a href="javascript:void(0)" onclick="toggleAuthMode()" id="toggle-link"
+                    style="color:#ff9800; font-weight:bold;">Daftar di sini</a>
+            </p>
         </div>
     </div>
-</div>
+
+    <div id="side-panel" class="side-panel hidden">
+        <div class="panel-header">
+            <button class="btn-back" onclick="closePanel()"><i class="fas fa-arrow-left"></i> Kembali</button>
+            <span id="panel-category-badge" class="badge-kategori">HOT</span>
+        </div>
+        <div id="panel-body"></div>
+    </div>
 
     <footer>
         <div class="footer-content">
             <div class="footer-column">
                 <h3>Cee Milincius</h3>
-                <p>Jajanan kekinian dengan cita rasa yang memanjakan lidah anak Gen Z. Kami menyajikan cemilan enak dengan bahan berkualitas.</p>
+                <p>Jajanan kekinian dengan cita rasa yang memanjakan lidah anak Gen Z. Kami menyajikan
+                    cemilan enak
+                    dengan bahan berkualitas.</p>
                 <div class="social-links">
-                    <a href="https://www.instagram.com/cee_milincius?igsh=MXNhZmZ0azdpYzkwZw==" target="_blank"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.tiktok.com/@cee_milincius?_r=1&_t=ZS-93GrRwIf88j" target="_blank"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/cee_milincius?igsh=MXNhZmZ0azdpYzkwZw=="
+                        target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@cee_milincius?_r=1&_t=ZS-93GrRwIf88j"
+                        target="_blank"><i  class="fab fa-tiktok"></i></a>
                 </div>
             </div>
-            <div class="footer-column">
-                <h3>Kontak Kami</h3>
-                <p><i class="fas fa-phone"></i> +62 858-1421-1259</p>
-                <p><i class="fas fa-envelope"></i> info@ceemilincius.com</p>
-                <p><i class="fas fa-map-marker-alt"></i> Jl. Pare-Wates, Kertoharjo, Sidorejo, Kec. Puncu, Kabupaten Kediri, Jawa Timur</p>
+                <div class="contact-icon">
+                    <div class="footer-column">
+                        <h3>Kontak Kami</h3>
+                        <p><i class="fas fa-phone"></i> +62 858-1421-1259</p>
+                        <p><i class="fas fa-envelope"></i> info@ceemilincius.com</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Jl. Pare-Wates, Kertoharjo, Sidorejo, Kec. Puncu,
+                            Kabupaten Kediri, Jawa Timur</p>
+                    </div>
+                </div>
+         <div class="footer-column">
+                 <h3>Jam Operasional</h3>
+                 <p>Selasa - Minggu: 18.00 - 22.00 WIB</p>
+             <p>Pesanan online bisa dilakukan sebelum jam operasional.</p>
             </div>
-            <div class="footer-column">
-                <h3>Jam Operasional</h3>
-                <p>Setiap Hari: 18.00 - 22.00 WIB</p>
-                <p>Pesanan online bisa dilakukan 24 jam</p>
-            </div>
-        </div>
-        <div class="copyright">
-            <p>&copy; 2026 CeeMilincius. All Right Reserved.</p>
-        </div>
-    </footer>
+         </div>
+         <div class="copyright">
+             <p>&copy; 2026 CeeMilincius. All Right Reserved.</p>
+</div>
+     </footer>
 
-    
     <script src="script.js"></script>
 </body>
+
 </html>
