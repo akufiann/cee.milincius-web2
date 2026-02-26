@@ -38,17 +38,40 @@
     </header>
 
     <main class="main-layout">
-        <aside class="side-info">
-            <div class="info-card">
-                <h3>Selamat Datang..</h3>
-                <p>Website ini sedang dalam pengembangan.<br>
-                Apabila mengalami kendala, harap contact admin website melalui email atau nomor wa yaa. Terimakasih</p>
+    
+    <aside class="side-info" id="aside-info">
+        <span class="close-aside-btn" onclick="closeAsidePopup()">&times;</span>
+        
+        <div class="info-card">
+            <h3>Selamat Datang..</h3>
+            <p>Website ini sedang dalam pengembangan.<br>
+            Apabila mengalami kendala, harap contact admin website melalui email atau nomor wa yaa. Terimakasih</p>
+        </div>
+        
+        <div class="info-card">
+            <h3>📍 Lokasi</h3>
+            <p>Kediri, Jawa Timur, Indonesia.</p>
+        </div>
+    </aside>
+
+    <div id="aside-overlay" class="aside-overlay" onclick="closeAsidePopup()"></div>
+
+    <div class="content-area">
+        <section class="dashboard-hero">
+            <div class="hero-content">
+                <img src="https://via.placeholder.com/80" alt="Logo" class="hero-main-logo">
+                <h1>Cee Milincius</h1>
+                <p>Cemilan Kekinian Favorit Gen-Z</p>
+                <button class="btn-mulai" onclick="document.getElementById('jajan').scrollIntoView()">Mulai Jajan</button>
             </div>
-            <div class="info-card">
-                <h3>📍 Lokasi</h3>
-                <p>Kediri, Jawa Timur, Indonesia.</p>
-            </div>
-        </aside>
+        </section>
+
+        <section class="area-jajan" id="jajan">
+            <div class="grid-menu" id="menu-container">
+                </div>
+        </section>
+    </div>
+    </main>
 
         <section class="dashboard-hero">
             <div class="hero-content">
