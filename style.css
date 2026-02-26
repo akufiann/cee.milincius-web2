@@ -344,22 +344,88 @@
      cursor: pointer;
  }
 
- /* RESPONSIVE */
- @media (max-width: 768px) {
-     .main-layout {
-         grid-template-columns: 1fr;
-     }
+ /* --- RESPONSIVE & ASIDE POPUP --- */
 
-     .side-info,
-     .nav-central {
-         display: none;
-     }
+/* Overlay latar belakang gelap untuk popup Aside di HP */
+.aside-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 9998;
+}
 
-     .side-panel {
-         width: 100%;
-         height: 80%;
-         top: auto;
-         bottom: 0;
-         border-radius: 20px 20px 0 0;
-     }
- }
+.aside-overlay.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    /* 1. Perbaikan Layout Utama */
+    .main-layout {
+        grid-template-columns: 1fr;
+    }
+
+    /* 2. Mengubah Side Info menjadi Pop-up di HP */
+    .side-info {
+        display: none; /* Default sembunyi */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 85%;
+        max-width: 350px;
+        background: #f9f9f9;
+        z-index: 9999;
+        padding: 25px 20px;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        border: none;
+    }
+
+    /* Class untuk memicu popup muncul via JS */
+    .side-info.show-popup {
+        display: block !important;
+        animation: popupSpring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* 3. Tombol Close di Pojok Kanan Atas Aside (Khusus HP) */
+    .close-aside-btn {
+        display: block !important;
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 30px;
+        color: #888;
+        cursor: pointer;
+        line-height: 1;
+    }
+
+    /* 4. Perbaikan Navbar di HP */
+    .nav-central {
+        display: none; /* Menu tengah sembunyi, nanti bisa pakai Hamburger */
+    }
+
+    /* 5. Perbaikan Side Panel (Detail Produk) di HP */
+    .side-panel {
+        width: 100%;
+        height: 85%;
+        top: auto;
+        bottom: 0;
+        border-radius: 25px 25px 0 0;
+    }
+}
+
+/* Animasi Popup */
+@keyframes popupSpring {
+    from { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Pastikan tombol close sembunyi di Desktop */
+.close-aside-btn {
+    display: none;
+}
