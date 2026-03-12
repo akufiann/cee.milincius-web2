@@ -10,7 +10,6 @@ if (localStorage.getItem('app_version') !== VERSION) {
 
 let currentUser = null;
 let isLoginMode = true;
-let currentAdmin = null;
 
 // Inisialisasi user dari localStorage (hanya sekali)
 try {
