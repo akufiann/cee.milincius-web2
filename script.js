@@ -1,3 +1,4 @@
+console.log('🚀 script.js mulai diload');
 // ==========================================
 // 1. PENGATURAN CACHE & VERSI
 // ==========================================
@@ -25,15 +26,17 @@ try {
 // 2. INISIALISASI
 // ==========================================
 function initApp() {
-    console.log('App initialized');
-    
-    // Panggil fungsi satu kali
+    function initApp() {
+    console.log('✅ initApp() DIPANGGIL - Baris 1');
     updateNavbar();
+    console.log('✅ updateNavbar selesai');
     muatMenu();
+    console.log('✅ muatMenu selesai');
     cekMobilePopup();
-    
-    // Admin trigger
+    console.log('✅ cekMobilePopup selesai');
     initAdminTrigger();
+    console.log('✅ initAdminTrigger selesai');
+}
     
     // Cek admin session
     try {
@@ -203,6 +206,9 @@ function logout() {
 // 6. FUNGSI MENU
 // ==========================================
 async function muatMenu() {
+    console.log('📢 muatMenu() DIMULAI');
+    const container = document.getElementById('menu-container');
+    console.log('📢 Container:', container);
     const container = document.getElementById('menu-container');
     if (!container) return;
 
