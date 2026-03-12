@@ -344,6 +344,135 @@
      cursor: pointer;
  }
 
+/* ADMIN FLOATING BUTTON */
+.admin-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 9999;
+    transition: all 0.3s;
+}
+
+.admin-fab:hover {
+    transform: scale(1.1);
+}
+
+.admin-fab.hidden {
+    display: none;
+}
+
+/* ADMIN CARDS */
+.admin-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.admin-card h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #ff9800;
+    padding-bottom: 10px;
+}
+
+.admin-form-group {
+    margin-bottom: 15px;
+}
+
+.admin-form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.admin-form-group input,
+.admin-form-group select,
+.admin-form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.admin-form-group input:focus,
+.admin-form-group select:focus,
+.admin-form-group textarea:focus {
+    border-color: #ff9800;
+    outline: none;
+}
+
+.admin-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 10px;
+}
+
+.admin-btn-primary {
+    background: #ff9800;
+    color: white;
+}
+
+.admin-btn-primary:hover {
+    background: #f57c00;
+}
+
+.admin-btn-danger {
+    background: #ff4444;
+    color: white;
+}
+
+.admin-btn-secondary {
+    background: #333;
+    color: white;
+}
+
+.admin-produk-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    background: white;
+}
+
+.admin-produk-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.admin-produk-info {
+    flex: 1;
+}
+
+.admin-produk-actions {
+    display: flex;
+    gap: 10px;
+}
+
  /* --- RESPONSIVE & ASIDE POPUP --- */
 
 /* Overlay latar belakang gelap untuk popup Aside di HP */
