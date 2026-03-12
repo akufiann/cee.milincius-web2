@@ -80,26 +80,73 @@ function openDetail(produk) {
     const body = document.getElementById('panel-body');
     const orderID = "CEE-" + Math.floor(1000 + Math.random() * 9000);
 
+    // Update badge kategori
+    const badge = document.getElementById('panel-category-badge');
+    if (badge) {
+        badge.textContent = produk.kategori || 'HOT';
+    }
+
+    // Isi konten panel (jangan hapus header yang sudah ada)
     body.innerHTML = `
-        <div class="panel-header-right">
-            <span class="close-panel-btn-right" onclick="closePanel()">&times;</span>
-        </div>
-        <div style="padding:20px; padding-top: 0;">
-            <img src="${produk.gambar_url}" style="width:100%; border-radius:15px; height:220px; object-fit:cover;">
+        <div style="padding:20px;">
+            <img src="${produk.gambar_url}" style="width:100%; border-radius:15px; height:220px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/400x220?text=No+Image'">
+            
             <div style="display:flex; justify-content:space-between; margin-top:15px;">
                 <h2>${produk.nama}</h2>
                 <h2 style="color:#ff9800">Rp ${Number(produk.harga).toLocaleString('id-ID')}</h2>
             </div>
-            <p style="color:#666; margin:15px 0; font-size:0.9rem;">${produk.deskripsi || 'Jajanan premium pilihan.'}</p>
-        </div>
-        <div class="panel-footer">
-            <button class="btn-checkout-final" onclick="prosesOrder('${produk.nama}', '${orderID}')">
-                Pesan via WhatsApp
+            
+            <p style="color:#666; margin:15px 0;">${produk.deskripsi || 'Jajanan premium pilihan.'}</p>
+            
+            <div style="margin:20px 0;">
+                <label style="font-weight:600; display:block; margin-bottom:10px;">Catatan (opsional):</label>
+                <textarea id="order-notes" placeholder="Contoh: Pedas, Level 2, dll" style="width:100%; padding:12px; border:2px solid #eee; border-radius:10px; resize:none;" rows="3"></textarea>
+            </div>
+            
+            <button class="btn-checkout-final" onclick="prosesOrder('${produk.nama}', '${orderID}', ${produk.harga})">
+                <i class="fab fa-whatsapp"></i> Pesan via WhatsApp
             </button>
         </div>
     `;
+    
     panel.classList.remove('hidden');
 }
+
+function prosesOrder(namaProduk, orderID, harga) {
+    console.log('Memesan:', namaProduk, orderID);
+    
+    // Cek login
+    if (!currentUser) {
+        alert('Silakan login/daftar terlebih dahulu!');
+        closePanel();
+        openLoginModal();
+        return;
+    }
+
+    const notes = document.getElementById('order-notes')?.value || '';
+    const catatan = notes ? `\n*Catatan:* ${notes}` : '';
+
+    const pesan = `Halo Kak, saya *${currentUser.username}* ingin memesan:
+        
+*Menu:* ${namaProduk}
+*Harga:* Rp ${Number(harga).toLocaleString('id-ID')}
+*ID Pesanan:* ${orderID}${catatan}
+
+*Data Pemesan:*
+📞 No. WhatsApp: ${currentUser.phone}
+📍 Alamat: ${currentUser.location}
+
+Mohon konfirmasi. Terima kasih! 🙏`;
+
+    const encodedPesan = encodeURIComponent(pesan);
+    const nomorAdmin = "6287823700686"; // Dari footer
+    
+    window.open(`https://wa.me/${nomorAdmin}?text=${encodedPesan}`, '_blank');
+    
+    setTimeout(() => closePanel(), 1000);
+}
+
+
 
 // ==========================================
 // 5. FUNGSI PENDUKUNG (NAVBAR, LOGOUT, DLL)
@@ -182,7 +229,12 @@ function updateAuthModeDisplay() {
     }
 }
 
-function closePanel() { document.getElementById('side-panel').classList.add('hidden'); }
+function closePanel() { 
+    const panel = document.getElementById('side-panel');
+    if (panel) {
+        panel.classList.add('hidden');
+    }
+}
 function logout() { 
     localStorage.removeItem('cee_user'); 
     currentUser = null;    // ← TAMBAHKAN INI (reset variable)
