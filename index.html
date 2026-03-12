@@ -136,6 +136,39 @@
 </div>
      </footer>
 
+<!-- ADMIN LOGIN MODAL (Tersembunyi) -->
+<div id="admin-login-modal" class="modal hidden">
+    <div class="login-box" style="max-width: 450px;">
+        <span class="close-btn" onclick="closeAdminModal()">&times;</span>
+        <h2 style="color: #ff9800;">🔐 Admin Access</h2>
+        <p>Masukkan kode rahasia untuk akses panel admin</p>
+        <div class="input-group">
+            <input type="password" id="admin-secret-code" placeholder="Kode Rahasia">
+            <input type="text" id="admin-phone" placeholder="No. HP Admin">
+        </div>
+        <button class="btn-save-login" onclick="verifyAdmin()" style="background: #333;">Masuk Admin</button>
+        <p style="margin-top: 15px; font-size: 0.8rem; color: #999;">
+            <i class="fas fa-shield-alt"></i> Khusus pengelola website
+        </p>
+    </div>
+</div>
+
+<!-- ADMIN FLOATING BUTTON (Muncul setelah login) -->
+<div id="admin-fab" class="admin-fab hidden" onclick="openAdminPanel()">
+    <i class="fas fa-cog"></i>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel" class="side-panel hidden" style="width: 500px; background: #f8f9fa;">
+    <div class="panel-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <button class="btn-back" onclick="closeAdminPanel()" style="color: white;"><i class="fas fa-arrow-left"></i> Kembali</button>
+        <span class="badge-kategori" style="background: rgba(255,255,255,0.2);">Admin Panel</span>
+    </div>
+    <div id="admin-panel-body" style="padding: 20px; overflow-y: auto; height: calc(100% - 70px);">
+        <!-- Konten akan diisi JavaScript -->
+    </div>
+</div>
+    
     <script src="script.js?v=1.1"></script>
 </body>
 
