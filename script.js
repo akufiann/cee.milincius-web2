@@ -17,6 +17,10 @@ function initApp() {
     updateNavbar();
     muatMenu();
     cekMobilePopup(); // <-- Ini fungsi buat munculin pop-up di HP
+
+     initAdminTrigger();
+    if (localStorage.getItem('cee_admin')) {
+        document.getElementById('admin-fab').classList.remove('hidden');
 }
 
 // ==========================================
@@ -335,3 +339,269 @@ async function saveLogin() {
         submitBtn.disabled = false;
     }
 }
+
+// ==========================================
+// ADMIN SYSTEM (TAMBAHKAN DI BAGIAN PALING BAWAH)
+// ==========================================
+
+let currentAdmin = JSON.parse(localStorage.getItem('cee_admin')) || null;
+
+// Double click logo untuk buka login admin
+function initAdminTrigger() {
+    const logo = document.querySelector('.nav-brand a');
+    if (logo) {
+        logo.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+            openAdminLogin();
+        });
+    }
+}
+
+function openAdminLogin() {
+    document.getElementById('admin-login-modal').classList.remove('hidden');
+    document.getElementById('admin-secret-code').value = '';
+    document.getElementById('admin-phone').value = '';
+}
+
+function closeAdminModal() {
+    document.getElementById('admin-login-modal').classList.add('hidden');
+}
+
+// Verifikasi admin
+async function verifyAdmin() {
+    const secret = document.getElementById('admin-secret-code').value;
+    const phone = document.getElementById('admin-phone').value;
+
+    if (!secret || !phone) {
+        alert('Kode rahasia dan No. HP harus diisi!');
+        return;
+    }
+
+    try {
+        const response = await fetch('/.netlify/functions/admin-auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ secret, phone })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Login gagal');
+        }
+
+        // Simpan session
+        currentAdmin = data.admin;
+        localStorage.setItem('cee_admin', JSON.stringify(data.admin));
+
+        closeAdminModal();
+        
+        // Tampilkan FAB
+        document.getElementById('admin-fab').classList.remove('hidden');
+        
+        // Buka panel admin
+        openAdminPanel();
+
+        alert(`Selamat datang, ${data.admin.name}!`);
+
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Login gagal: ' + error.message);
+    }
+}
+
+// Buka panel admin
+function openAdminPanel() {
+    if (!currentAdmin) {
+        openAdminLogin();
+        return;
+    }
+
+    const panel = document.getElementById('admin-panel');
+    const body = document.getElementById('admin-panel-body');
+    
+    body.innerHTML = generateAdminContent();
+    panel.classList.remove('hidden');
+}
+
+function closeAdminPanel() {
+    document.getElementById('admin-panel').classList.add('hidden');
+}
+
+// Generate konten admin
+function generateAdminContent() {
+    return `
+        <div class="admin-card">
+            <h3><i class="fas fa-user-shield"></i> Admin Info</h3>
+            <p><strong>Nama:</strong> ${currentAdmin.name}</p>
+            <p><strong>Role:</strong> ${currentAdmin.role}</p>
+            <p><strong>No. HP:</strong> ${currentAdmin.phone}</p>
+            <button class="admin-btn admin-btn-danger" onclick="logoutAdmin()" style="width:100%;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+
+        <div class="admin-card">
+            <h3><i class="fas fa-users-cog"></i> Manajemen Admin</h3>
+            <button class="admin-btn admin-btn-primary" onclick="showAddAdminForm()" style="width:100%; margin-bottom:10px;">
+                <i class="fas fa-user-plus"></i> Tambah Admin Baru
+            </button>
+            <div id="admin-list">Loading...</div>
+        </div>
+
+        <div class="admin-card">
+            <h3><i class="fas fa-box"></i> Manajemen Produk</h3>
+            <p class="text-muted" style="margin-bottom:15px;">Fitur CRUD produk menyusul di update berikutnya</p>
+            <button class="admin-btn admin-btn-secondary" style="width:100%;" disabled>
+                <i class="fas fa-plus-circle"></i> Tambah Produk (Coming Soon)
+            </button>
+        </div>
+    `;
+
+    // Load daftar admin
+    setTimeout(loadAdmins, 100);
+}
+
+// Load daftar admin
+async function loadAdmins() {
+    try {
+        const response = await fetch('/.netlify/functions/admin-manage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'getAdmins' })
+        });
+
+        const admins = await response.json();
+        
+        let html = '';
+        admins.forEach(admin => {
+            html += `
+                <div class="admin-produk-item">
+                    <div class="admin-produk-info">
+                        <h4>${admin.name}</h4>
+                        <p>${admin.phone} | ${admin.role}</p>
+                    </div>
+                    <div class="admin-produk-actions">
+                        ${currentAdmin.role === 'super' && admin.phone !== currentAdmin.phone ? 
+                            `<button class="admin-btn-danger" onclick="deleteAdmin('${admin.phone}')" style="padding:5px 10px;">
+                                <i class="fas fa-trash"></i>
+                            </button>` : ''
+                        }
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('admin-list').innerHTML = html || '<p>Belum ada admin lain</p>';
+
+    } catch (error) {
+        document.getElementById('admin-list').innerHTML = '<p>Gagal load admin</p>';
+    }
+}
+
+// Form tambah admin
+function showAddAdminForm() {
+    const body = document.getElementById('admin-panel-body');
+    body.innerHTML = `
+        <div class="admin-card">
+            <h3><i class="fas fa-user-plus"></i> Tambah Admin Baru</h3>
+            <div class="admin-form-group">
+                <label>Nama Admin</label>
+                <input type="text" id="new-admin-name" placeholder="Contoh: Admin 2">
+            </div>
+            <div class="admin-form-group">
+                <label>No. WhatsApp</label>
+                <input type="text" id="new-admin-phone" placeholder="08123456789">
+            </div>
+            <div class="admin-form-group">
+                <label>Role</label>
+                <select id="new-admin-role">
+                    <option value="admin">Admin Biasa</option>
+                    <option value="super">Super Admin</option>
+                </select>
+            </div>
+            <button class="admin-btn admin-btn-primary" onclick="saveNewAdmin()">Simpan</button>
+            <button class="admin-btn admin-btn-secondary" onclick="openAdminPanel()">Batal</button>
+        </div>
+    `;
+}
+
+// Simpan admin baru
+async function saveNewAdmin() {
+    const name = document.getElementById('new-admin-name').value.trim();
+    const phone = document.getElementById('new-admin-phone').value.trim();
+    const role = document.getElementById('new-admin-role').value;
+
+    if (!name || !phone) {
+        alert('Nama dan No. HP harus diisi!');
+        return;
+    }
+
+    try {
+        const response = await fetch('/.netlify/functions/admin-manage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'addAdmin',
+                data: { name, phone, role, created_by: currentAdmin.phone }
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Gagal simpan');
+        }
+
+        alert('Admin baru berhasil ditambahkan!');
+        openAdminPanel();
+
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+// Hapus admin
+async function deleteAdmin(phone) {
+    if (!confirm('Yakin ingin menghapus admin ini?')) return;
+
+    try {
+        const response = await fetch('/.netlify/functions/admin-manage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'deleteAdmin',
+                data: { phone, deleted_by: currentAdmin.phone }
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || 'Gagal hapus');
+        }
+
+        alert('Admin berhasil dihapus!');
+        openAdminPanel();
+
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+// Logout admin
+function logoutAdmin() {
+    if (confirm('Yakin ingin logout?')) {
+        localStorage.removeItem('cee_admin');
+        currentAdmin = null;
+        document.getElementById('admin-fab').classList.add('hidden');
+        closeAdminPanel();
+    }
+}
+
+// Update fungsi initApp yang sudah ada
+// Cari fungsi initApp() di kode Anda, lalu tambahkan baris ini di dalamnya:
+// initAdminTrigger();
+// if (localStorage.getItem('cee_admin')) {
+//     document.getElementById('admin-fab').classList.remove('hidden');
+// }
