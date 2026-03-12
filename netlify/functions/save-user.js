@@ -1,85 +1,108 @@
 const { Client } = require('pg');
 
 exports.handler = async (event, context) => {
-  // Hanya izinkan metode POST agar tidak sembarang orang bisa akses
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      },
+      body: ''
+    };
+  }
+
+  // Hanya izinkan POST
   if (event.httpMethod !== 'POST') {
     return { 
       statusCode: 405, 
+      headers: { 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ message: 'Metode Tidak Diizinkan' }) 
     };
   }
 
-  // Mengambil koneksi database dari Environment Variables Netlify (Sangat Aman)
   const client = new Client({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false // Wajib untuk koneksi ke Neon
-    }
+    ssl: { rejectUnauthorized: false }
   });
 
   try {
-    // Ambil data yang dikirim dari script.js
+    // Parse data dari request
     const { username, phone, location } = JSON.parse(event.body);
+    console.log('Menerima data:', { username, phone, location });
 
-    // Validasi sederhana
+    // Validasi
     if (!username || !phone) {
       return { 
-        statusCode: 400, 
+        statusCode: 400,
+        headers: { 'Access-Control-Allow-Origin': '*' },
         body: JSON.stringify({ message: 'Nama dan No.HP wajib diisi' }) 
       };
     }
 
+    // Koneksi ke database
     await client.connect();
-    
-    // Query SQL untuk memasukkan data ke tabel users
-    // Pastikan di Neon kamu sudah ada tabel bernama 'users'
+    console.log('Koneksi database berhasil');
+
+    // Buat tabel jika belum ada
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(100) NOT NULL,
+        phone VARCHAR(20) NOT NULL,
+        location TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Insert data
     const query = 'INSERT INTO users (username, phone, location) VALUES ($1, $2, $3) RETURNING *';
-    const values = [username, phone, location];
+    const values = [username, phone, location || 'Belum diisi'];
     
     const result = await client.query(query, values);
+    console.log('Data tersimpan:', result.rows[0]);
+
+    // Tutup koneksi
     await client.end();
 
+    // Kirim response sukses
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ 
-        message: "Data berhasil disimpan ke Neon secara rahasia!",
+        success: true,
+        message: "Data berhasil disimpan!",
         data: result.rows[0] 
       }),
     };
+
   } catch (err) {
-    console.error("Error Database:", err);
+    console.error("Error Database Detail:", err);
+    
+    // Pastikan koneksi ditutup jika error
+    try {
+      await client.end();
+    } catch (e) {
+      // Abaikan error saat tutup koneksi
+    }
+
+    // Kirim response error
     return {
       statusCode: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ 
+        success: false,
         message: "Gagal menyimpan data", 
-        error: err.message 
+        error: err.message
       }),
     };
   }
-
 };
-
-    // Simpan ke localStorage
-    localStorage.setItem('users', JSON.stringify(userData));
-    currentUser = userData;
-    
-    // Update navbar
-    updateNavbar();
-    
-    // Tutup modal
-    closeModal();
-    
-    alert(`Selamat datang ${username}! ${isLoginMode ? 'Login' : 'Pendaftaran'} berhasil.`);
-}
-
-try {
-    await client.connect();
-    // ... proses simpan ...
-} finally {
-    // BAGIAN INI WAJIB: Biar koneksi database gak gantung/penuh
-    await client.end(); 
-}
-
-
