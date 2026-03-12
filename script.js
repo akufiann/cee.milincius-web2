@@ -179,3 +179,11 @@ function scrollToJajan() { document.getElementById('jajan').scrollIntoView({ beh
 
 // Menjalankan aplikasi saat halaman selesai dimuat
 document.addEventListener('DOMContentLoaded', initApp);
+
+// Click outside modal to close
+window.onclick = function(event) {
+    const modal = document.getElementById('login-modal');
+    if (event.target === modal) {
+        closeModal();
+    }
+}
