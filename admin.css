@@ -316,6 +316,52 @@
     }
 }
 
+/* ============================================
+   TOMBOL KEMBALI - BIAR KELIATAN
+   ============================================ */
+
+/* Styling tombol kembali */
+#admin-panel .panel-header .btn-back {
+    background: white !important;
+    color: #667eea !important;
+    border: 2px solid white !important;
+    border-radius: 30px !important;
+    padding: 8px 20px !important;
+    font-weight: bold !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Hover effect */
+#admin-panel .panel-header .btn-back:hover {
+    background: #667eea !important;
+    color: white !important;
+    transform: scale(1.05);
+}
+
+/* Icon di dalam tombol */
+#admin-panel .panel-header .btn-back i {
+    margin-right: 8px;
+    color: inherit;
+}
+
+/* Versi HP - lebih besar */
+@media (max-width: 768px) {
+    #admin-panel .panel-header .btn-back {
+        padding: 10px 25px !important;
+        font-size: 16px !important;
+        background: white !important;
+        color: #667eea !important;
+        border: 2px solid white !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
+    }
+}
+
+#admin-panel .panel-header {
+    background: linear-gradient(135deg, #5a2e8a, #1e3c72) !important;
+    border-bottom: 3px solid #ff9800;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
    
