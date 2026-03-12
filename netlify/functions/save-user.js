@@ -61,34 +61,6 @@ exports.handler = async (event, context) => {
 
 };
 
-async function saveLogin() {
-    const username = document.getElementById('login-username').value.trim();
-    const phone = document.getElementById('login-phone').value.trim();
-    const locationInput = document.getElementById('login-location');
-    const location = locationInput ? locationInput.value.trim() : '';
-
-    // Validasi
-    if (!username) {
-        alert('Nama harus diisi!');
-        return;
-    }
-    if (!phone) {
-        alert('Nomor WhatsApp harus diisi!');
-        return;
-    }
-    if (!isLoginMode && !location) {
-        alert('Alamat harus diisi saat mendaftar!');
-        return;
-    }
-
-    // Data user
-    const userData = {
-        username: username,
-        phone: phone,
-        location: location || 'Belum diisi',
-        loginTime: new Date().toISOString()
-    };
-
     // Simpan ke localStorage
     localStorage.setItem('users', JSON.stringify(userData));
     currentUser = userData;
@@ -109,4 +81,5 @@ try {
     // BAGIAN INI WAJIB: Biar koneksi database gak gantung/penuh
     await client.end(); 
 }
+
 
