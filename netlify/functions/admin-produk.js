@@ -1,12 +1,14 @@
 const { Client } = require('pg');
 
 exports.handler = async (event, context) => {
+  // Headers CORS
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS'
   };
 
+  // Handle OPTIONS request (preflight)
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
@@ -33,30 +35,39 @@ exports.handler = async (event, context) => {
     if (event.httpMethod === 'POST') {
       const { nama, harga, kategori, gambar_url, deskripsi, admin_phone } = JSON.parse(event.body);
       
+      // Validasi
       if (!nama || !harga || !gambar_url) {
         return {
           statusCode: 400,
           headers,
-          body: JSON.stringify({ message: 'Nama, harga, dan gambar wajib diisi' })
+          body: JSON.stringify({ 
+            success: false,
+            message: 'Nama, harga, dan gambar wajib diisi' 
+          })
         };
       }
 
+      // Insert ke database
       const result = await client.query(
         `INSERT INTO produk (nama, harga, kategori, gambar_url, deskripsi, created_by) 
          VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [nama, harga, kategori || 'Umum', gambar_url, deskripsi || '', admin_phone]
+        [nama, harga, kategori || 'Umum', gambar_url, deskripsi || '', admin_phone || 'system']
       );
 
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ success: true, produk: result.rows[0] })
+        body: JSON.stringify({ 
+          success: true, 
+          message: 'Produk berhasil ditambahkan',
+          produk: result.rows[0] 
+        })
       };
     }
 
     // PUT - Update produk
     if (event.httpMethod === 'PUT') {
-      const { id, nama, harga, kategori, gambar_url, deskripsi, admin_phone } = JSON.parse(event.body);
+      const { id, nama, harga, kategori, gambar_url, deskripsi } = JSON.parse(event.body);
       
       const result = await client.query(
         `UPDATE produk 
@@ -68,7 +79,11 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ success: true, produk: result.rows[0] })
+        body: JSON.stringify({ 
+          success: true, 
+          message: 'Produk berhasil diupdate',
+          produk: result.rows[0] 
+        })
       };
     }
 
@@ -81,22 +96,33 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ success: true, message: 'Produk dihapus' })
+        body: JSON.stringify({ 
+          success: true, 
+          message: 'Produk berhasil dihapus' 
+        })
       };
     }
 
+    // Method tidak diizinkan
     return {
       statusCode: 405,
       headers,
-      body: JSON.stringify({ message: 'Method not allowed' })
+      body: JSON.stringify({ 
+        success: false,
+        message: 'Method not allowed' 
+      })
     };
 
   } catch (err) {
-    console.error('Error:', err);
+    console.error('Database error:', err);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ message: 'Server error', error: err.message })
+      body: JSON.stringify({ 
+        success: false,
+        message: 'Server error', 
+        error: err.message 
+      })
     };
   } finally {
     await client.end();
