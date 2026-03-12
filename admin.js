@@ -196,21 +196,29 @@ async function loadAdminDashboard() {
     if (!body) return;
     
     try {
-        // Load products from database
+        // Load products
         await loadAdminProducts();
         
         // Render dashboard
         body.innerHTML = generateAdminDashboard();
         
-        // Load admin list
-        loadAdminList();
+        // Load admin list (jika ada)
+        if (typeof loadAdminList === 'function') {
+            loadAdminList();
+        }
+        
+        // Refresh main menu TANPA mengganggu yang sudah ada
+        if (typeof window.muatMenu === 'function') {
+            // Panggil tanpa await agar tidak blocking
+            window.muatMenu().catch(e => console.log('Menu refresh error:', e));
+        }
         
     } catch (error) {
-        console.error('Error loading dashboard:', error);
+        console.error('Dashboard error:', error);
         body.innerHTML = `
             <div class="admin-card">
                 <h3><i class="fas fa-exclamation-triangle"></i> Error</h3>
-                <p style="color:#ff4444;">Gagal memuat dashboard: ${error.message}</p>
+                <p style="color:#ff4444;">${error.message}</p>
                 <button class="admin-btn admin-btn-primary" onclick="loadAdminDashboard()">
                     <i class="fas fa-sync"></i> Coba Lagi
                 </button>
@@ -373,51 +381,87 @@ function switchAdminTab(tab) {
 }
 
 // ============================================
-// PRODUCT MANAGEMENT
+// PRODUCT MANAGEMENT - VERSI AMAN
 // ============================================
 async function loadAdminProducts() {
     try {
+        console.log('Loading admin products...');
+        
+        // Gunakan endpoint yang sama dengan script.js
         const response = await fetch('/.netlify/functions/get-produk');
+        
         if (!response.ok) {
-            throw new Error('Gagal mengambil produk');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-        adminProducts = await response.json();
+        
+        const data = await response.json();
+        console.log('Products loaded:', data);
+        
+        // Simpan ke variable global
+        adminProducts = Array.isArray(data) ? data : [];
         return adminProducts;
+        
     } catch (error) {
         console.error('Error loading products:', error);
         adminProducts = [];
-        throw error;
+        
+        // Tampilkan error di panel admin (optional)
+        const productsList = document.getElementById('admin-products-list');
+        if (productsList) {
+            productsList.innerHTML = `
+                <div style="text-align:center; padding:30px; color:#ff4444;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:2rem; margin-bottom:10px;"></i>
+                    <p>Gagal memuat produk: ${error.message}</p>
+                </div>
+            `;
+        }
+        
+        return [];
     }
 }
 
 function generateProductsList() {
-    if (!adminProducts || adminProducts.length === 0) {
+    // Pastikan adminProducts adalah array
+    const products = adminProducts || [];
+    
+    if (products.length === 0) {
         return `
             <div style="text-align:center; padding:30px;">
                 <i class="fas fa-box-open" style="font-size:3rem; color:#ccc; margin-bottom:15px;"></i>
                 <p style="color:#999;">Belum ada produk</p>
+                <button class="admin-btn admin-btn-success" onclick="showAddProductForm()" style="margin-top:10px;">
+                    <i class="fas fa-plus"></i> Tambah Produk
+                </button>
             </div>
         `;
     }
     
-    return adminProducts.map((product, index) => `
-        <div class="admin-produk-item">
-            <img src="${product.gambar_url}" class="admin-produk-img" 
-                 onerror="this.src='https://via.placeholder.com/60'">
-            <div class="admin-produk-info">
-                <h4>${product.nama}</h4>
-                <p>Rp ${Number(product.harga).toLocaleString('id-ID')} | ${product.kategori || 'Umum'}</p>
+    return products.map((product, index) => {
+        // Validasi data produk
+        const nama = product.nama || 'Produk';
+        const harga = product.harga ? Number(product.harga).toLocaleString('id-ID') : '0';
+        const kategori = product.kategori || 'Umum';
+        const gambar = product.gambar_url || 'https://via.placeholder.com/60';
+        const productId = product.id || index;
+        
+        return `
+            <div class="admin-produk-item">
+                <img src="${gambar}" class="admin-produk-img" onerror="this.src='https://via.placeholder.com/60'">
+                <div class="admin-produk-info">
+                    <h4>${nama}</h4>
+                    <p>Rp ${harga} | ${kategori}</p>
+                </div>
+                <div class="admin-produk-actions">
+                    <button onclick="editProduct(${index})" style="background:#ff9800; color:white; padding:8px 12px; border:none; border-radius:5px; cursor:pointer;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteProduct(${productId})" style="background:#ff4444; color:white; padding:8px 12px; border:none; border-radius:5px; cursor:pointer;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
             </div>
-            <div class="admin-produk-actions">
-                <button onclick="editProduct(${index})" style="background:#ff9800; color:white;">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="deleteProduct(${product.id})" style="background:#ff4444; color:white;">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function showAddProductForm() {
@@ -464,52 +508,89 @@ function showAddProductForm() {
 }
 
 async function saveProduct() {
-    const name = document.getElementById('product-name')?.value.trim();
-    const price = document.getElementById('product-price')?.value.trim();
-    const category = document.getElementById('product-category')?.value.trim();
-    const image = document.getElementById('product-image')?.value.trim();
-    const description = document.getElementById('product-description')?.value.trim();
+    // Ambil nilai form
+    const nameInput = document.getElementById('product-name');
+    const priceInput = document.getElementById('product-price');
+    const categoryInput = document.getElementById('product-category');
+    const imageInput = document.getElementById('product-image');
+    const descInput = document.getElementById('product-description');
+    
+    if (!nameInput || !priceInput || !imageInput) {
+        alert('Form tidak lengkap!');
+        return;
+    }
+    
+    const name = nameInput.value.trim();
+    const price = priceInput.value.trim();
+    const category = categoryInput ? categoryInput.value.trim() : '';
+    const image = imageInput.value.trim();
+    const description = descInput ? descInput.value.trim() : '';
 
-    if (!name || !price || !image) {
-        alert('Nama, harga, dan gambar harus diisi!');
+    // Validasi
+    if (!name) {
+        alert('Nama produk harus diisi!');
+        return;
+    }
+    if (!price) {
+        alert('Harga harus diisi!');
+        return;
+    }
+    if (!image) {
+        alert('URL gambar harus diisi!');
         return;
     }
 
+    // Validasi harga harus angka
+    const hargaNumber = parseInt(price);
+    if (isNaN(hargaNumber) || hargaNumber <= 0) {
+        alert('Harga harus angka yang valid!');
+        return;
+    }
+
+    // Tampilkan loading
     const saveBtn = event.target;
     const originalText = saveBtn.innerHTML;
-    saveBtn.innerHTML = '<span class="admin-spinner"></span> Menyimpan...';
+    saveBtn.innerHTML = 'Menyimpan...';
     saveBtn.disabled = true;
 
     try {
+        const productData = {
+            nama: name,
+            harga: hargaNumber,
+            kategori: category || 'Umum',
+            gambar_url: image,
+            deskripsi: description || '',
+            admin_phone: currentAdmin ? currentAdmin.phone : 'system'
+        };
+        
+        console.log('Saving product:', productData);
+        
+        // Kirim ke server
         const response = await fetch('/.netlify/functions/admin-produk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                nama: name,
-                harga: parseInt(price),
-                kategori: category || 'Umum',
-                gambar_url: image,
-                deskripsi: description || '',
-                admin_phone: currentAdmin.phone
-            })
+            body: JSON.stringify(productData)
         });
 
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.message || 'Gagal menyimpan');
+            throw new Error(result.message || `Error ${response.status}`);
         }
 
-        showAdminToast('Produk berhasil ditambahkan!', 'success');
+        // Success
+        alert('Produk berhasil ditambahkan!');
+        
+        // Reload dashboard
         await loadAdminDashboard();
         
         // Refresh main menu
-        if (typeof muatMenu === 'function') {
-            muatMenu();
+        if (typeof window.muatMenu === 'function') {
+            window.muatMenu();
         }
 
     } catch (error) {
-        console.error('Error saving product:', error);
+        console.error('Save error:', error);
         alert('Gagal menyimpan: ' + error.message);
     } finally {
         saveBtn.innerHTML = originalText;
@@ -912,3 +993,24 @@ if (document.readyState === 'loading') {
 } else {
     initAdmin();
 }
+
+// ============================================
+// FUNGSI DEBUG (AMAN)
+// ============================================
+function testProdukAPI() {
+    fetch('/.netlify/functions/get-produk')
+        .then(res => res.json())
+        .then(data => {
+            console.log('API Response:', data);
+            alert(`Sukses! Jumlah produk: ${data.length}`);
+        })
+        .catch(err => {
+            console.error('API Error:', err);
+            alert('Error: ' + err.message);
+        });
+}
+
+// Panggil otomatis saat admin panel dibuka (untuk debug)
+document.addEventListener('admin-panel-opened', function() {
+    testProdukAPI();
+});
