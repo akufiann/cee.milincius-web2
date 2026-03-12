@@ -8,6 +8,7 @@ if (localStorage.getItem('app_version') !== VERSION) {
 }
 
 let currentUser = JSON.parse(localStorage.getItem('cee_user')) || null;
+let isLoginMode = true; // Tambahkan ini di bagian atas file script.js, setelah deklarasi currentUser
 
 // ==========================================
 // 2. INISIALISASI SAAT WEB DIBUKA
@@ -105,12 +106,20 @@ function openDetail(produk) {
 // ==========================================
 function updateNavbar() {
     const userDisplay = document.getElementById('user-display');
-    if (currentUser && userDisplay) {
+    if (!userDisplay) return;
+
+    if (currentUser && currentUser.username) {
+        // Tampilkan info user jika login
         userDisplay.innerHTML = `
             <div class="user-info-nav">
                 <span>Halo, <b>${currentUser.username}</b></span>
                 <button class="btn-login-nav" style="background:#ff4444;" onclick="logout()">Logout</button>
             </div>
+        `;
+    } else {
+        // Tampilkan tombol login jika belum login
+        userDisplay.innerHTML = `
+            <button class="btn-login-nav" onclick="openLoginModal()">Daftar/Login</button>
         `;
     }
 }
@@ -174,7 +183,12 @@ function updateAuthModeDisplay() {
 }
 
 function closePanel() { document.getElementById('side-panel').classList.add('hidden'); }
-function logout() { localStorage.removeItem('cee_user'); location.reload(); }
+function logout() { 
+    localStorage.removeItem('cee_user'); 
+    currentUser = null;    // ← TAMBAHKAN INI (reset variable)
+    updateNavbar();        // ← TAMBAHKAN INI (update tampilan)
+    // location.reload();  // Bisa dihapus karena sudah pakai updateNavbar
+}
 function scrollToJajan() { document.getElementById('jajan').scrollIntoView({ behavior: 'smooth' }); }
 
 // Menjalankan aplikasi saat halaman selesai dimuat
@@ -185,5 +199,87 @@ window.onclick = function(event) {
     const modal = document.getElementById('login-modal');
     if (event.target === modal) {
         closeModal();
+    }
+}
+
+// =================
+// FUNGSI SAVE LOGIN
+// =================
+
+async function saveLogin() {
+    const username = document.getElementById('login-username').value.trim();
+    const phone = document.getElementById('login-phone').value.trim();
+    const locationInput = document.getElementById('login-location');
+    const location = locationInput ? locationInput.value.trim() : '';
+
+    // Validasi
+    if (!username) {
+        alert('Nama harus diisi!');
+        return;
+    }
+    if (!phone) {
+        alert('Nomor WhatsApp harus diisi!');
+        return;
+    }
+    if (!isLoginMode && !location) {
+        alert('Alamat harus diisi saat mendaftar!');
+        return;
+    }
+
+    // Data user
+    const userData = {
+        username: username,
+        phone: phone,
+        location: location || 'Belum diisi',
+        loginTime: new Date().toISOString()
+    };
+
+    // Tampilkan loading di button
+    const submitBtn = document.getElementById('btn-auth-submit');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Menyimpan...';
+    submitBtn.disabled = true;
+
+    try {
+        // Jika mode REGISTER, kirim ke database
+        if (!isLoginMode) {
+            console.log('Mengirim data ke database...');
+            
+            const response = await fetch('/.netlify/functions/save-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Gagal menyimpan ke database');
+            }
+
+            const result = await response.json();
+            console.log('Response dari database:', result);
+        }
+
+        // Simpan ke localStorage (untuk semua mode)
+        localStorage.setItem('cee_user', JSON.stringify(userData));
+        currentUser = userData;
+        
+        // Update navbar
+        updateNavbar();
+        
+        // Tutup modal
+        closeModal();
+        
+        alert(`Selamat datang ${username}! ${isLoginMode ? 'Login' : 'Pendaftaran'} berhasil.`);
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Gagal: ' + error.message);
+    } finally {
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     }
 }
