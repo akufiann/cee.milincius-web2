@@ -1,0 +1,350 @@
+/* ============================================
+   ADMIN PANEL STYLES - File terpisah
+   ============================================ */
+
+/* Admin Floating Button */
+.admin-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 9999;
+    transition: all 0.3s;
+}
+
+.admin-fab:hover {
+    transform: scale(1.1) rotate(90deg);
+}
+
+.admin-fab.hidden {
+    display: none;
+}
+
+/* Admin Panel Container */
+#admin-panel {
+    width: 500px;
+    background: #f8f9fa;
+}
+
+/* Admin Cards */
+.admin-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+}
+
+.admin-card h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #ff9800;
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-card h3 i {
+    color: #ff9800;
+}
+
+/* Admin Form Elements */
+.admin-form-group {
+    margin-bottom: 15px;
+}
+
+.admin-form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.admin-form-group input,
+.admin-form-group select,
+.admin-form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #eee;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.3s;
+}
+
+.admin-form-group input:focus,
+.admin-form-group select:focus,
+.admin-form-group textarea:focus {
+    border-color: #ff9800;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,152,0,0.1);
+}
+
+/* Admin Buttons */
+.admin-btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-right: 10px;
+    font-size: 0.95rem;
+}
+
+.admin-btn-primary {
+    background: #ff9800;
+    color: white;
+}
+
+.admin-btn-primary:hover {
+    background: #f57c00;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255,152,0,0.3);
+}
+
+.admin-btn-danger {
+    background: #ff4444;
+    color: white;
+}
+
+.admin-btn-danger:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+}
+
+.admin-btn-secondary {
+    background: #333;
+    color: white;
+}
+
+.admin-btn-secondary:hover {
+    background: #555;
+    transform: translateY(-2px);
+}
+
+.admin-btn-success {
+    background: #00C851;
+    color: white;
+}
+
+.admin-btn-success:hover {
+    background: #007E33;
+}
+
+.admin-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Admin Product List */
+.admin-produk-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    background: white;
+    transition: all 0.3s;
+}
+
+.admin-produk-item:hover {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    border-color: #ff9800;
+}
+
+.admin-produk-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-right: 15px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.admin-produk-info {
+    flex: 1;
+}
+
+.admin-produk-info h4 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.admin-produk-info p {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.admin-produk-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.admin-produk-actions button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+}
+
+.admin-produk-actions button:hover {
+    transform: scale(1.05);
+}
+
+/* Admin Stats Cards */
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.admin-stat-card {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.admin-stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 10px 0;
+}
+
+.admin-stat-card .stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Admin Tabs */
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+}
+
+.admin-tab {
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.admin-tab.active {
+    color: #ff9800;
+}
+
+.admin-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #ff9800;
+    border-radius: 3px 3px 0 0;
+}
+
+/* Loading Spinner */
+.admin-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #ff9800;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Toast Notification */
+.admin-toast {
+    position: fixed;
+    bottom: 100px;
+    right: 100px;
+    background: #333;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 50px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #admin-panel {
+        width: 100%;
+    }
+    
+    .admin-fab {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .admin-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-produk-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .admin-produk-img {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    
+    .admin-produk-actions {
+        margin-top: 10px;
+    }
+}
