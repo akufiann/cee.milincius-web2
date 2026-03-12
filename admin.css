@@ -318,8 +318,35 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+   
     #admin-panel {
-        width: 100%;
+        width: 100% !important;
+        height: 100% !important;
+        top: 0 !important;
+        right: 0 !important;
+        border-radius: 0 !important;
+        position: fixed !important;
+    }
+    
+    #admin-panel-body {
+        height: calc(100% - 70px) !important;
+        overflow-y: auto !important;
+        padding: 15px !important;
+    }
+    
+    .admin-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .admin-tab {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+    
+    .admin-form-group input,
+    .admin-form-group select,
+    .admin-form-group textarea {
+        font-size: 16px; /* Mencegah zoom di iOS */
     }
     
     .admin-fab {
@@ -346,5 +373,46 @@
     
     .admin-produk-actions {
         margin-top: 10px;
+    }
+}
+
+/* Untuk HP yang sangat kecil */
+@media (max-width: 480px) {
+    .admin-card {
+        padding: 12px;
+    }
+    
+    .admin-card h3 {
+        font-size: 1rem;
+    }
+    
+    .admin-tabs {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .admin-tab {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .admin-tab.active::after {
+        display: none;
+    }
+    
+    .admin-tab.active {
+        background: #ff9800;
+        color: white;
+        border-radius: 8px;
+    }
+    
+    .admin-produk-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .admin-btn {
+        width: 100%;
+        margin-bottom: 10px;
     }
 }
