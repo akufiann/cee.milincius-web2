@@ -428,10 +428,6 @@ async function verifyAdmin() {
     }
 }
 
-function openAdminPanel() {
-    alert('Fitur admin panel akan segera hadir!');
-}
-
 function closeAdminPanel() {
     const panel = document.getElementById('admin-panel');
     if (panel) panel.classList.add('hidden');
