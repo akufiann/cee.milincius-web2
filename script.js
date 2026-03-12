@@ -115,6 +115,64 @@ function updateNavbar() {
     }
 }
 
+// ===========================
+// FUNGSI MODAL LOGIN/REGISTER
+// ===========================
+function openLoginModal() {
+    const modal = document.getElementById('login-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        // Reset form
+        document.getElementById('login-username').value = '';
+        document.getElementById('login-phone').value = '';
+        const locationField = document.getElementById('login-location');
+        if (locationField) locationField.value = '';
+        
+        // Set ke mode default (login)
+        isLoginMode = true;
+        updateAuthModeDisplay();
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('login-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+function toggleAuthMode() {
+    isLoginMode = !isLoginMode;
+    updateAuthModeDisplay();
+}
+
+function updateAuthModeDisplay() {
+    const title = document.getElementById('auth-title');
+    const desc = document.getElementById('auth-desc');
+    const registerFields = document.getElementById('register-only-fields');
+    const toggleText = document.getElementById('toggle-text');
+    const toggleLink = document.getElementById('toggle-link');
+    const submitBtn = document.getElementById('btn-auth-submit');
+
+    if (isLoginMode) {
+        // Mode Login
+        title.textContent = '👋 Selamat Datang Kembali!';
+        desc.textContent = 'Masuk untuk melanjutkan pemesanan.';
+        registerFields.classList.add('hidden');
+        toggleText.textContent = 'Belum punya akun?';
+        toggleLink.textContent = 'Daftar di sini';
+        submitBtn.textContent = 'Masuk & Belanja';
+    } else {
+        // Mode Register
+        title.textContent = '📝 Daftar Akun Baru';
+        desc.textContent = 'Isi data diri untuk memudahkan pengantaran.';
+        registerFields.classList.remove('hidden');
+        toggleText.textContent = 'Sudah punya akun?';
+        toggleLink.textContent = 'Masuk di sini';
+        submitBtn.textContent = 'Daftar & Belanja';
+    }
+}
+
 function closePanel() { document.getElementById('side-panel').classList.add('hidden'); }
 function logout() { localStorage.removeItem('cee_user'); location.reload(); }
 function scrollToJajan() { document.getElementById('jajan').scrollIntoView({ behavior: 'smooth' }); }
