@@ -209,7 +209,6 @@ async function muatMenu() {
     console.log('📢 muatMenu() DIMULAI');
     const container = document.getElementById('menu-container');
     console.log('📢 Container:', container);
-    const container = document.getElementById('menu-container');
     if (!container) return;
 
     try {
